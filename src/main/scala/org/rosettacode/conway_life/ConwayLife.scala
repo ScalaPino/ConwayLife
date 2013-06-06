@@ -1,16 +1,8 @@
-package org.rosettacode.conway_life.scala
+package org.rosettacode.conway_life
 
 import scala.swing._
-import BorderPanel.Position.{Center, South}
-import java.awt.{Graphics2D, Color, Polygon}
-
-/**
- * Created by IntelliJ IDEA.
- * User: BT024593
- * Date: 12/01/2010
- * Time: 15:53:13
- * To change this template use File | Settings | File Templates.
- */
+import BorderPanel.Position.{ Center, South }
+import java.awt.{ Graphics2D, Color, Polygon }
 
 object ConwayLife extends SimpleSwingApplication {
   def top = new MainFrame {
@@ -52,8 +44,8 @@ object ConwayLife extends SimpleSwingApplication {
       }
       val board = new Panel {
         val poly = new Polygon(Array(10, 20, 20, 30, 30, 10),
-                              Array(10, 10, 0, 0, 30, 30),
-                              6)
+          Array(10, 10, 0, 0, 30, 30),
+          6)
         override def paintComponent(g: Graphics2D) = {
           super.paintComponent(g)
           g.setColor(Color.black)

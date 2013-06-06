@@ -1,5 +1,7 @@
 // By Pedro Furlanetto 
 
+package org.rosettacode.conway_life
+
 import scala.swing._
 import Swing._
 

@@ -1,4 +1,5 @@
-package org.rosettacode.conway_life.scala
+package org.rosettacode.conway_life
+import scala.language.implicitConversions
 
 object ConwayPatterns {
   // Lists for all patterns available
@@ -77,7 +78,6 @@ object ConwayPatterns {
                  |   XXX
                  |"""
 
-
   // Spaceship patterns
   val glider = """|
                   |   X
@@ -130,12 +130,12 @@ object ConwayPatterns {
     (xs, y) <- pattern.stripMargin.lines.map(_.zipWithIndex).zipWithIndex
     (c, x) <- xs
     if c != ' '
-  } yield Coord(x, y)
+  } yield Life(x, y)
 
   // Move a set of coordinates to a point
-  def moveTo(pattern: String, to: Coord) = (pattern: Iterator[Coord]) map (_ + to)
-  def moveTo(coords: Iterator[Coord], to: Coord) = coords map (_ + to)
-  def moveTo(coords: Traversable[Coord], to: Coord) = coords map (_ + to)
+  def moveTo(pattern: String, to: Life) = (pattern: Iterator[Life]) map (_ + to)
+  def moveTo(coords: Iterator[Life], to: Life) = coords map (_ + to)
+  def moveTo(coords: Traversable[Life], to: Life) = coords map (_ + to)
 
 }
 
