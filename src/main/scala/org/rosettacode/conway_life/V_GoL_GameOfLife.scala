@@ -10,10 +10,11 @@ import ConwayPatterns._
 import java.awt.Toolkit
 
 object GameOfLife extends SimpleSwingApplication {
-  System.setProperty("java.util.Arrays.useLegacyMergeSort", "true") // bug_id=6923200
+  System.setProperty("java.util.Arrays.useLegacyMergeSort", "true") // Java bug_id=6923200
   val shortcutKeyMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
 
   def top = new MainFrame {
+    peer.setLocationRelativeTo(null)
     title = "Conway's Life for Scala"
 
     menuBar = GoL_Menu.menuBar
@@ -28,6 +29,7 @@ object GameOfLife extends SimpleSwingApplication {
         // This sorting criteria inverts the rows, so that row 0
         // can be the row on the bottom instead of the top
         def coordSorting: ((Cell, VCell)) => (Int, Int) = { case (coord, _) => (coord.y, coord.x) }
+
         for ((_, cell) <- DisplayGrid.cells.toSeq sortBy coordSorting) contents.append(cell)
       }
 
@@ -83,6 +85,6 @@ object GameOfLife extends SimpleSwingApplication {
   }
 
   // default Actor constructor
-  val sandsOfTime = ActorSystem("SandsOfTime").actorOf(Props[SandsOfTime],
+  val sandsOfTime = ActorSystem("GolSandsOfTime").actorOf(Props[SandsOfTime],
     name = "SandsOfTime")
 }

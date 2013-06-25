@@ -8,7 +8,7 @@ import Swing._
 object gui extends SimpleSwingApplication {
   private val colQtd = 50
   private val rowQtd = 50
-  val cellSize = 5
+  private val cellSize = 5
   private val colors = Array(java.awt.Color.white, java.awt.Color.blue, java.awt.Color.yellow, java.awt.Color.green) 
   
   var cells = Array.ofDim[Cell](colQtd, rowQtd)  

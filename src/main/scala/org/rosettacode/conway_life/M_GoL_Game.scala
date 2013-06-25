@@ -1,6 +1,8 @@
 package org.rosettacode.conway_life
-import scala.language.postfixOps
+
+import scala.collection.parallel.mutable.ParHashMap
 import scala.language.implicitConversions
+import scala.language.postfixOps
 
 /**
  * Basic virtual game cell contains own x,y coordinate and neighbors.
@@ -9,9 +11,9 @@ class Cell(val x: Int, val y: Int) {
 
   // A memoized list of all neighbors of a coordinate
   lazy val vicinityCells = for {
-    xo <- Cell.offsets
-    yo <- Cell.offsets if (xo != 0 || yo != 0)
-  } yield Cell(x + xo, y + yo)
+    dx <- Cell.offsets
+    dy <- Cell.offsets if (dx != 0 || dy != 0)
+  } yield Cell(x + dx, y + dy)
 
   // Coordinates can be used as offsets
   def +(c: Cell) = Cell(x + c.x, y + c.y)
@@ -23,27 +25,30 @@ class Cell(val x: Int, val y: Int) {
    *  an unique identity. This is made  by the apply method.
    */
 
-  override def toString = f"Life($x%d, $y%d)"
+  override def toString = f"Cell($x%d, $y%d)"
 } // class Cell
 
 object Cell {
   private val offsets = -1 to 1 // For neighbor selection
-  val cache = collection.mutable.HashMap.empty[(Int, Int), Cell].par //34224ms
+
+  // The cache will check if the new Cell already exists.
+  // If not create a new one.
+  // It makes equality and groupBy (identity) possible.
+  val cache: ParHashMap[(Int, Int), Cell] = new ParHashMap[(Int, Int), Cell]() {
+    override def default(key: (Int, Int)) = {
+      val d = new Cell(key._1, key._2); cache((key._1, key._2)) = d; d
+    }
+  }
+
+  // The Cell factory
+  def apply(x: Int, y: Int): Cell = { // getOrElseUpdate not available for .par
+    cache(x, y)
+  }
 
   // An Ordering for coordinates which sorts by the X coordinate
   val xOrdering = Ordering.fromLessThan((_: Cell).x < (_: Cell).x)
   // An Ordering for coordinates which sorts by the Y coordinate
   val yOrdering = Ordering.fromLessThan((_: Cell).y < (_: Cell).y)
-
-  // The Cell factory which checks if the new cell already exists.
-  // If so, copy the cached one.
-  // It makes equality and groupBy (identity) possible.
-  def apply(x: Int, y: Int): Cell = { // getOrElseUpdate not available for .par
-    cache.get(x, y) match {
-      case Some(v) => v
-      case None    => val d = new Cell(x, y); cache((x, y)) = d; d
-    }
-  }
 
   // Any Tuple2[Int, Int] can be used as a Cell through this implicit conversion.  
   implicit def coordFromTuple(t: (Int, Int)) = apply(t._1, t._2)
@@ -126,27 +131,29 @@ object Game {
    * The next generation is composed of babies from fecund
    *  neighborhoods and adults on stable neighborhoods.
    */
+
   def nextGeneration(population: Set[Cell],
                      rulestringS: Set[Int] = Set(2, 3),
-                     rulestringB: Set[Int] = Set(3)): Set[Cell] = {
-    /**
+                     rulestringB: Set[Int] = Set(3)): Set[Cell] =
+    {
+      /*
      * A map containing all coordinates that are neighbors of Cells which
      * are alive, together with the number of Cells it is neighbor of.
      */
-    val neighbors =
-      population.toList flatMap (_.vicinityCells) groupBy (identity) map {
-        case (coor, list) => (coor, list.length)
-      }
 
-      // Filter all neighbors for desired characteristics
+      val neighbors: Map[Cell, Int] =
+        population.toList flatMap (_.vicinityCells) groupBy (identity) map {
+          case (cell, list) => (cell, list.length)
+        }
 
-      // Criterion of rulestring Birth
-      def reproductions = neighbors.filter(a => rulestringB contains a._2).keys
-      def survivors = neighbors.filter(a => (rulestringS contains a._2)
-        // Criterion of Survivors rulestring 
-        && (population contains a._1)).keySet // Previous living Cell
+        // Filter all neighbors for desired characteristics
 
-    survivors ++ reproductions
-  }
+        // Criterion of rulestring Birth
+        def reproductions = neighbors.filter(a => rulestringB contains a._2).keys
+        def survivors = neighbors.filter(a => (rulestringS contains a._2)
+          // Criterion of Survivors rulestring 
+          && (population contains a._1)).keySet // Previous living Cell
+      survivors ++ reproductions
+    }
 } // object Game
 

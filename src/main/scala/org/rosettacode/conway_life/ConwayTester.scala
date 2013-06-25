@@ -40,18 +40,14 @@ object ConwayTester extends App {
    */
   def getUnstableGenerations(first: Game) = (
     conwayIterator(first)
-      take MaxGenerations
-      map (_.size)
-      sliding WindowSize
-      map (_.distinct.length)
-      takeWhile (_ > 1) length)
+      take MaxGenerations map (_.size) sliding WindowSize map
+      (_.distinct.length) takeWhile (_ > 1) length)
 
   /**
    * Return the first generation, properly centered, for a given pattern
    * as represented by a string.
    */
-  def initPattern(pattern: String) =
-    Game(pattern: Iterator[Cell]).recenter
+  def initPattern(pattern: String) =    Game(pattern).recenter
 
   /**
    * For each pattern passed, apply a function which will measure some characteristic

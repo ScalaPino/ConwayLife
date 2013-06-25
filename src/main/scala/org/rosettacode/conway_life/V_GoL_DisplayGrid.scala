@@ -10,13 +10,13 @@ object DisplayGrid {
   /*
    * Create a map with all visual Cells, key is a Life coordinate, value is Cell.         
    * 
-   * "flatten: _*" = Repeated parameters "This notation tells the compiler to pass each
+   * "flatten: _*" = "Spread operator" "This notation tells the compiler to pass each
    * element of list as its own argument to echo, rather than all of it as a single argument."
    */
 
-  val cells: Map[Cell, VCell] =
-    Map(List.tabulate(colQtd, rowQtd)((x, y) => Cell(x, y)
-      -> (new VCell( // the callback, toggle dead/alive
+  val cells =
+    Map(Seq.tabulate(colQtd, rowQtd)((x, y) =>
+      Cell(x, y) -> (new VCell( // the callback, toggle dead/alive
         { cell => this(Cell(x, y)) = !cell.isAlive }))).flatten: _*)
 
   private var internalGrid = Game.empty
@@ -42,6 +42,7 @@ object DisplayGrid {
       internalGrid -= coord
       if (displayable(coord)) cells(coord).dead
     }
+
   def switch(coord: Cell) = this(coord) = !this(coord)
 
 } // object DisplayGrid

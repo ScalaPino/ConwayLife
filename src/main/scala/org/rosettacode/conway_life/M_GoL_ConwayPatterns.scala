@@ -127,12 +127,12 @@ object ConwayPatterns {
   // Helper methods
   // Enable constructing sets of coordinates from string patterns.
   implicit def coordsFromPattern(pattern: String) = for {
-    (xs, y) <- pattern.stripMargin.lines.map(_.zipWithIndex).zipWithIndex
-    (c, x) <- xs
-    if c != ' '
-  } yield Cell(x, y)
-
-  // Move a set of coordinates to a point
+    (tupleCharCommaXCharPos, lineNumber) <- pattern.stripMargin.lines.map(_.zipWithIndex).zipWithIndex
+    (char, xCharPos) <- tupleCharCommaXCharPos
+    if char != ' '
+  } yield Cell(xCharPos, lineNumber)
+  
+   // Move a set of coordinates to a point
   def moveTo(pattern: String, to: Cell) = (pattern: Iterator[Cell]) map (_ + to)
   def moveTo(coords: Iterator[Cell], to: Cell) = coords map (_ + to)
   def moveTo(coords: Traversable[Cell], to: Cell) = coords map (_ + to)
